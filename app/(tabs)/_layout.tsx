@@ -28,18 +28,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "search",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
 
       <Tabs.Screen
         name="explore"
@@ -53,6 +41,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="(search)" />
     </Tabs>
   );
 }
