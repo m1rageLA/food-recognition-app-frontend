@@ -14,11 +14,12 @@ export default function Id() {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handlePress = (value: string) => {
-    router.push(`./(unit)/${value}2`);
+    router.push(`./(item)/${value}`);
   };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.index}>
+
         <View style={styles.input}>
           <Searchbar
             placeholder="Search"
@@ -30,81 +31,63 @@ export default function Id() {
         <View style={styles.toplevelUnits}>
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("1");
-            }}
+            onPress={() => handlePress("1")}
           >
             <Text>1</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("2");
-            }}
+            onPress={() => handlePress("2")}
           >
             <Text>2</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("3");
-            }}
+            onPress={() => handlePress("3")}
           >
             <Text>3</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("fruits");
-            }}
+            onPress={() => handlePress("fruits")}
           >
             <Text>4</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("4");
-            }}
+            onPress={() => handlePress("4")}
           >
             <Text>5</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("5");
-            }}
+            onPress={() => handlePress("5")}
           >
             <Text>6</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("bakery");
-            }}
+            onPress={() => handlePress("bakery")}
           >
             <Text>7</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("snacks");
-            }}
+            onPress={() => handlePress("snacks")}
           >
             <Text>8</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.unit}
-            onPress={() => {
-              handlePress("beverages");
-            }}
+            onPress={() => handlePress("beverages")}
           >
             <Text>9</Text>
           </TouchableOpacity>
@@ -132,18 +115,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
+  backButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#e8e8e8",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  backButtonText: {
+    color: "#007bff",
+    fontSize: 16,
+  },
   openCamera: {
     flex: 0.1,
     display: "flex",
     justifyContent: "center",
-    // backgroundColor: "red",
     marginBottom: 40,
   },
   input: {
     flex: 0.2,
     display: "flex",
     justifyContent: "center",
-    // backgroundColor: "green",
     marginTop: 40,
   },
   toplevelUnits: {
@@ -155,7 +147,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
     width: "100%",
-    // backgroundColor: "yellow",
   },
   unit: {
     display: "flex",
@@ -166,10 +157,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#e8e8e8",
     borderRadius: 10,
     minWidth: 0,
-  },
-  unitLink: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "red",
   },
 });

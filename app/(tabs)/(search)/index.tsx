@@ -13,7 +13,7 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handlePress = (value: string) => {
-    router.push(`./(unit)/${value}2`);
+    router.push(`./(unit)/${value}`);
   };
   return (
     <SafeAreaView style={styles.container}>
