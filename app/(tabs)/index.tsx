@@ -20,6 +20,7 @@ export default function HomeScreen() {
         />
       </Appbar.Header>
       <View style={styles.header}>
+        <Text style={styles.title}>Today</Text>
         <Text style={styles.calories}>{calories} cal</Text>
         <Text style={styles.caloriesGoal}>/ {caloriesGoal} goal</Text>
       </View>
@@ -52,6 +53,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     backgroundColor: "#89BD71",
+  },
+  title: {
+    fontSize: 24,
+    color: "white",
+    fontWeight: "bold",
   },
   header: {
     display: "flex",

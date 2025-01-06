@@ -2,8 +2,8 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
-import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,9 +11,10 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#89BD71", // Зеленый цвет для активной вкладки
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarInactiveTintColor: "#a3a3a3", // Цвет для неактивных вкладок (по желанию)
       }}
     >
       <Tabs.Screen
@@ -35,13 +36,22 @@ export default function TabLayout() {
           title: "Explore",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
+              name={focused ? "checkbox" : "checkbox-outline"}
               color={color}
             />
           ),
         }}
       />
-      <Tabs.Screen name="(search)" />
+
+      <Tabs.Screen
+        name="(search)"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "search" : "search-outline"} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
