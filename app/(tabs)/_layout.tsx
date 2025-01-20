@@ -3,7 +3,6 @@ import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,10 +10,10 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#89BD71", // Зеленый цвет для активной вкладки
+        tabBarActiveTintColor: "#89BD71",
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarInactiveTintColor: "#a3a3a3", // Цвет для неактивных вкладок (по желанию)
+        tabBarInactiveTintColor: "#a3a3a3", 
       }}
     >
       <Tabs.Screen

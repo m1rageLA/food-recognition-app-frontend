@@ -37,21 +37,7 @@ export default function Explore() {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.sectionTitle}>Breakfast</Text>
-        {mealData.map((item, index) => (
-          <View key={index} style={styles.foodItem}>
-            <Text style={styles.foodName}>{item.name}</Text>
-            <Text style={styles.foodCals}>{item.cals} cal</Text>
-          </View>
-        ))}
-        <Text style={styles.sectionTitle}>Lunch</Text>
-        {mealData.map((item, index) => (
-          <View key={index} style={styles.foodItem}>
-            <Text style={styles.foodName}>{item.name}</Text>
-            <Text style={styles.foodCals}>{item.cals} cal</Text>
-          </View>
-        ))}
-        <Text style={styles.sectionTitle}>Dinner</Text>
+
         {mealData.map((item, index) => (
           <View key={index} style={styles.foodItem}>
             <Text style={styles.foodName}>{item.name}</Text>
