@@ -8,6 +8,8 @@ import {
   IconButton,
   Menu,
   PaperProvider,
+  Modal,
+  TextInput,
 } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
@@ -22,6 +24,10 @@ export default function HomeScreen() {
   const [adviceAI, setAdviceAI] = React.useState(
     `Eat a balanced diet: include more vegetables, fruits, proteins, and whole grains, avoid overeating, and minimize sugar and processed food intake. Drink enough water, follow a regular eating schedule, and avoid late-night snacks.`
   );
+  const [visibleMenu, setVisibleMenu] = React.useState(false);
+  const [visibleModal, setVisibleModal] = React.useState(false); // Состояние для управления модальным окном
+  const [goal, setGoal] = React.useState('');
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,6 +42,7 @@ export default function HomeScreen() {
 
     fetchData();
   }, []);
+
   const refreshData = async () => {
     try {
       setLoading(true);
@@ -49,20 +56,33 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
-  const { nutrition, foodConsumed, goal } = data || {};
+
+  const { nutrition, foodConsumed, goal: currentGoal } = data || {};
   const totalCalories = nutrition?.calories || 0;
   const fats = nutrition?.fats || 0;
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
 
-  const closeMenu = () => setVisible(false);
+  const openMenu = () => setVisibleMenu(true);
+  const closeMenu = () => setVisibleMenu(false);
+
+  const openModal = () => {
+    closeMenu(); // Закрытие меню перед открытием модального окна
+    setVisibleModal(true); // Открытие модального окна
+  };
+
+  const closeModal = () => setVisibleModal(false);
+
+  const handleGoalSubmit = () => {
+    setCaloriesGoal(goal); // Обновляем цель калорий
+    
+    setGoal(''); // Очистка поля ввода после отправки
+    closeModal(); // Закрытие модального окна
+  };
 
   return (
     <PaperProvider>
       <View style={styles.index}>
         <Appbar.Header style={styles.appbarHeader}>
           <Appbar.Content title="AnyMeal" titleStyle={{ color: "white" }} />
-
           <View
             style={{
               display: "flex",
@@ -78,24 +98,23 @@ export default function HomeScreen() {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              visible={visible}
+              visible={visibleMenu}
               onDismiss={closeMenu}
               anchor={
                 <IconButton
                   icon="dots-vertical"  // Иконка для кнопки меню
                   iconColor="white"
                   size={30}
-                  style={{marginTop: "-35px"}}
+                  style={{ marginTop: "-35px" }}
                   onPress={openMenu}
                 />
               }
             >
-              <Menu.Item onPress={() => {}} title="Set goal" />
+              <Menu.Item onPress={openModal} title="Set goal" />
               <Divider />
               <Menu.Item onPress={() => {}} title="Log out" />
             </Menu>
           </View>
-
           <UploadPhoto />
         </Appbar.Header>
         <View style={styles.header}>
@@ -111,11 +130,7 @@ export default function HomeScreen() {
             fat={nutrition?.fats || 0}
           />
           <Text style={styles.textOfSection}>AI advice</Text>
-
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            style={styles.infoBox}
-          >
+          <ScrollView contentContainerStyle={styles.scrollContent} style={styles.infoBox}>
             <Text style={styles.textAdvice}>{adviceAI}</Text>
           </ScrollView>
           <Button
@@ -128,6 +143,20 @@ export default function HomeScreen() {
             Refresh
           </Button>
         </ScrollView>
+
+        {/* Модальное окно для установки цели */}
+        <Modal visible={visibleModal} onDismiss={closeModal} contentContainerStyle={styles.modalContainer}>
+          <TextInput
+            label="Set your calorie goal"
+            value={goal}
+            onChangeText={setGoal}
+            style={styles.input}
+            keyboardType="numeric"
+          />
+          <Button textColor="white" buttonColor="#89BD71" mode="contained" onPress={handleGoalSubmit} style={styles.button}>
+            Set Goal
+          </Button>
+        </Modal>
       </View>
     </PaperProvider>
   );
@@ -191,5 +220,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginLeft: 10,
     marginBottom: 20,
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+  },
+  input: {
+    marginBottom: 20,
+  },
+  button: {
+    marginTop: 20,
   },
 });

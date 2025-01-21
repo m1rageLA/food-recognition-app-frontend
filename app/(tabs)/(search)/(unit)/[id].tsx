@@ -96,6 +96,7 @@ export default function Id() {
           <Button
             icon="camera"
             mode="contained"
+            buttonColor="#89BD71"
             onPress={() => console.log("Pressed")}
           >
             Press me
@@ -110,10 +111,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+
   },
   index: {
     flex: 1,
     paddingHorizontal: 20,
+    
   },
   backButton: {
     marginTop: 20,
