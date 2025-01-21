@@ -60,11 +60,7 @@ export default function Explore() {
   return (
     <View style={styles.index}>
       <Appbar.Header style={styles.appbarHeader}>
-        <Appbar.Content title="Hello Lila" titleStyle={{ color: "white" }} />
-        <Avatar.Image
-          size={40}
-          source={require("../../assets/images/woman.jpg")}
-        />
+        <Appbar.Content title="AnyMeal" titleStyle={{ color: "white" }} />
       </Appbar.Header>
 
       <View style={styles.header}>

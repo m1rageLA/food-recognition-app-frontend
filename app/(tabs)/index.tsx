@@ -1,6 +1,14 @@
 import * as React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { Appbar, Avatar, Button } from "react-native-paper";
+import {
+  Appbar,
+  Avatar,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  PaperProvider,
+} from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
 import { getFoodList } from "../services/api";
@@ -17,8 +25,8 @@ export default function HomeScreen() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getFoodList(); // Fetch data from server
-        setData(response[0]); // Assuming response is an array, use the first item
+        const response = await getFoodList();
+        setData(response[0]);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -32,8 +40,8 @@ export default function HomeScreen() {
     try {
       setLoading(true);
       console.log("Данные обновляются...");
-      const response = await getFoodList(); // Вызов API для получения новых данных
-      setData(response[0]); // Обновление состояния с новыми данными
+      const response = await getFoodList();
+      setData(response[0]);
     } catch (err) {
       setError(err.message);
       console.error("Ошибка при обновлении данных:", err);
@@ -44,44 +52,84 @@ export default function HomeScreen() {
   const { nutrition, foodConsumed, goal } = data || {};
   const totalCalories = nutrition?.calories || 0;
   const fats = nutrition?.fats || 0;
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
 
   return (
-    <View style={styles.index}>
-      <Appbar.Header style={styles.appbarHeader}>
-        <Appbar.Content title="Hello dUC" titleStyle={{ color: "white" }} />
-        <Avatar.Image
-          size={40}
-          source={require("../../assets/images/woman.jpg")}
-        />
-        <UploadPhoto />
-      </Appbar.Header>
-      <View style={styles.header}>
-        <Text style={styles.title}>Today</Text>
-        <Text style={styles.calories}>{totalCalories} cal</Text>
-        <Text style={styles.caloriesGoal}>/ {caloriesGoal} goal</Text>
-      </View>
-      <ScrollView style={styles.container}>
-        <Text style={styles.textOfSection}>Stats</Text>
-        <DailyMacrosStats proteins={nutrition?.proteins || 0} carbs={nutrition?.carbohydrates || 0} fat={nutrition?.fats || 0} />
-        <Text style={styles.textOfSection}>AI advice</Text>
+    <PaperProvider>
+      <View style={styles.index}>
+        <Appbar.Header style={styles.appbarHeader}>
+          <Appbar.Content title="AnyMeal" titleStyle={{ color: "white" }} />
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          style={styles.infoBox}
-        >
-          <Text style={styles.textAdvice}>{adviceAI}</Text>
-        </ScrollView>
-        <Button
+          <View
+            style={{
+              display: "flex",
+              alignItems: "center",
+              paddingTop: 50,
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <Menu
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <IconButton
+                  icon="dots-vertical"  // Иконка для кнопки меню
+                  iconColor="white"
+                  size={30}
+                  style={{marginTop: "-35px"}}
+                  onPress={openMenu}
+                />
+              }
+            >
+              <Menu.Item onPress={() => {}} title="Set goal" />
+              <Divider />
+              <Menu.Item onPress={() => {}} title="Log out" />
+            </Menu>
+          </View>
+
+          <UploadPhoto />
+        </Appbar.Header>
+        <View style={styles.header}>
+          <Text style={styles.title}>Today</Text>
+          <Text style={styles.calories}>{totalCalories} cal</Text>
+          <Text style={styles.caloriesGoal}>/ {caloriesGoal} goal</Text>
+        </View>
+        <ScrollView style={styles.container}>
+          <Text style={styles.textOfSection}>Stats</Text>
+          <DailyMacrosStats
+            proteins={nutrition?.proteins || 0}
+            carbs={nutrition?.carbohydrates || 0}
+            fat={nutrition?.fats || 0}
+          />
+          <Text style={styles.textOfSection}>AI advice</Text>
+
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            style={styles.infoBox}
+          >
+            <Text style={styles.textAdvice}>{adviceAI}</Text>
+          </ScrollView>
+          <Button
             icon="refresh"
             mode="contained"
             buttonColor="#89BD71"
-            style={{marginTop: 50}}
+            style={{ marginTop: 50 }}
             onPress={refreshData}
           >
             Refresh
           </Button>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </PaperProvider>
   );
 }
 
@@ -120,8 +168,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   scrollContent: {
-    paddingHorizontal: 18, // отступы по бокам
-    paddingVertical: 20, // отступы сверху и снизу
+    paddingHorizontal: 18,
+    paddingVertical: 20,
   },
   textAdvice: {
     fontSize: 15,
