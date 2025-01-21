@@ -69,7 +69,7 @@ export default function Explore() {
       <View style={styles.header}>
         <Text style={styles.title}>Today</Text>
         <Text style={styles.totalCalories}>{totalCalories} cal</Text>
-        <Text style={styles.caloriesGoal}>/ {calorieGoal} goal</Text>
+        {/* <Text style={styles.caloriesGoal}>/ {calorieGoal} goal</Text> */}
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -101,7 +101,7 @@ export default function Explore() {
             buttonColor="#89BD71"
             onPress={refreshData}
           >
-            Обновить
+            Refresh
           </Button>
         </View>
       </ScrollView>
