@@ -29,12 +29,16 @@ const getHeaders = (): AxiosRequestConfig["headers"] => {
   };
 };
 
-export const getFoodByPhoto = async (file: any) => {
+export const getFoodByPhoto = async (file1: Blob) => {
+  
+  const file = new File([file1], 'image.jpg', { type: "image/jpeg" })
   const formData = new FormData();
+  formData.append('photo', file);
+  // const formData = new FormData();
 
-  // Убедись, что ты передаешь правильный формат
-  formData.append("photo", file);
-
+  // // Убедись, что ты передаешь правильный формат
+  // formData.append("photo", file);
+  console.log(file)
   try {
     const response = await axios.post('http://localhost:3000/food/getFoodByPhoto', formData, {
         headers: {
