@@ -138,17 +138,19 @@ const UploadPhoto = () => {
                 </CameraView>
               ) : (
                 <View style={styles.result}>
-                  <Text>Is that {food?.name}?</Text>
+                  <Text style={{fontSize: 30}}>Is that {food?.name}?</Text>
                   <TextInput
                     label="Enter the number of grams"
+                    style={{marginTop: 20, width: "80%"}}
                     onChangeText={(text) => setGrams(text)}
                   />
                   <Button
-                    icon="camera"
                     mode="contained"
+                    buttonColor="#89BD71"
                     onPress={handleAcceptFood}
+                    style={{marginTop: 20, marginBottom: 30, width: "80%"}}
                   >
-                    Press me
+                    Confirm
                   </Button>
                   <Button onPress={() => setPhotoTaken(false)}>
                     Take Another Photo

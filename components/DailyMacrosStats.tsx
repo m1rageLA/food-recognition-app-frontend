@@ -1,11 +1,10 @@
 import React from "react";
-import { StyleSheet, Text } from "react-native";
-import { View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 interface DailyMacrosStatsProps {
-  proteins: number;
-  carbs: number;
-  fat: number;
+  proteins: number; // В граммах
+  carbs: number; // В граммах
+  fat: number; // В граммах
 }
 
 const DailyMacrosStats: React.FC<DailyMacrosStatsProps> = ({
@@ -13,13 +12,45 @@ const DailyMacrosStats: React.FC<DailyMacrosStatsProps> = ({
   carbs,
   fat,
 }) => {
+  const calculatePercentage = (
+    value: number,
+    totalCalories: number
+  ): number => {
+    return Math.round((value / totalCalories) * 100);
+  };
+
+  // Калорийность макронутриентов
+  const PROTEIN_CALORIES = 4; // 1 грамм белка = 4 калории
+  const CARB_CALORIES = 4; // 1 грамм углеводов = 4 калории
+  const FAT_CALORIES = 9; // 1 грамм жиров = 9 калорий
+
+  // Расчет общей калорийности
+  const totalCalories =
+    proteins * PROTEIN_CALORIES +
+    carbs * CARB_CALORIES +
+    fat * FAT_CALORIES;
+
+  // Расчет процентных значений
+  const proteinPercentage = calculatePercentage(
+    proteins * PROTEIN_CALORIES,
+    totalCalories
+  );
+  const carbPercentage = calculatePercentage(
+    carbs * CARB_CALORIES,
+    totalCalories
+  );
+  const fatPercentage = calculatePercentage(
+    fat * FAT_CALORIES,
+    totalCalories
+  );
+
   return (
     <View>
       <View style={styles.statistics}>
         <View style={styles.childStatistics}>
           <View
             style={{
-              height: `${carbs}%`,
+              height: `${carbPercentage}%`,
               backgroundColor: "#89d381",
               ...styles.childStatistics__text,
             }}
@@ -30,7 +61,7 @@ const DailyMacrosStats: React.FC<DailyMacrosStatsProps> = ({
         <View style={styles.childStatistics}>
           <View
             style={{
-              height: `${proteins}%`,
+              height: `${proteinPercentage}%`,
               backgroundColor: "#F7A2BD",
               ...styles.childStatistics__text,
             }}
@@ -41,7 +72,7 @@ const DailyMacrosStats: React.FC<DailyMacrosStatsProps> = ({
         <View style={styles.childStatistics}>
           <View
             style={{
-              height: `${fat}%`,
+              height: `${fatPercentage}%`,
               backgroundColor: "#FFD978",
               ...styles.childStatistics__text,
             }}
@@ -63,11 +94,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingBottom: 18,
   },
-  value: {
-    width: "100%",
-    backgroundColor: "red",
-  },
-
   statistics: {
     display: "flex",
     justifyContent: "space-around",
@@ -75,12 +101,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     height: 180,
-
   },
   childStatistics: {
     overflow: "hidden",
     width: "30%",
-    height: "100%", // Additional styling for the child
+    height: "100%",
     backgroundColor: "#e8e8e8",
     borderRadius: 30,
     display: "flex",
