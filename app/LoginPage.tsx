@@ -1,9 +1,16 @@
 import * as React from "react";
-import { ScrollView, StyleSheet, Text, View, ImageBackground } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+} from "react-native";
 import { Appbar, Avatar, Button } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
 import TextInput from "@/components/Login/TextInput";
+import { loginRequest } from "./services/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState({ value: "" });
@@ -14,19 +21,26 @@ export default function LoginPage() {
     `Eat a balanced diet: include more vegetables, fruits, proteins, and whole grains, avoid overeating, and minimize sugar and processed food intake. Drink enough water, follow a regular eating schedule, and avoid late-night snacks.`
   );
 
+  const handleSignIn = async () => {
+    try {
+      await loginRequest(email.value, password.value);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
   return (
     <View style={styles.index}>
       <ImageBackground
-        source={require('../assets/texture.png')} 
-        style={[styles.header, {opacity: 1}]}
+        source={require("../assets/texture.png")}
+        style={[styles.header, { opacity: 1 }]}
         resizeMode="cover"
-        
       >
         <Text style={styles.title}>AnyMeal</Text>
       </ImageBackground>
       <View style={styles.main}>
         <View style={styles.form}>
-        <Text style={styles.titleBlack}>Sign in</Text>
+          <Text style={styles.titleBlack}>Sign in</Text>
           <TextInput
             label="Email"
             returnKeyType="next"
@@ -38,7 +52,7 @@ export default function LoginPage() {
           <TextInput
             label="Password"
             returnKeyType="next"
-            onChangeText={(text) => setEmail({ value: text })}
+            onChangeText={(text) => setPassword({ value: text })}
             autoCapitalize="none"
             textContentType="password"
             secureTextEntry={true}
@@ -50,7 +64,7 @@ export default function LoginPage() {
             style={styles.button}
             icon=""
             mode="contained"
-            onPress={() => console.log("Pressed")}
+            onPress={handleSignIn}
           >
             Sign in
           </Button>

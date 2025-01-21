@@ -15,6 +15,10 @@ export default function HomeScreen() {
   const handlePress = (value: string) => {
     router.push(`./(unit)/${value}`);
   };
+
+  const openCamera = () => {
+    
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.index}>
@@ -110,11 +114,12 @@ export default function HomeScreen() {
         </View>
         <View style={styles.openCamera}>
           <Button
+          buttonColor="#89BD71"
             icon="camera"
             mode="contained"
-            onPress={() => console.log("Pressed")}
+            onPress={openCamera}
           >
-            Press me
+            Camera
           </Button>
         </View>
       </View>
