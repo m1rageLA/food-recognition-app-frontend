@@ -1,24 +1,60 @@
 import * as React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { Appbar, Avatar } from "react-native-paper";
-
-// Тестовые данные для страницы
-const mealData = [
-  { name: "Strawberries", cals: 42 },
-  { name: "Milk: Low Fat", cals: 71 },
-  { name: "Oatmeal", cals: 116 },
-  { name: "Hot Tea", cals: 2 },
-];
-
-// БЖУ
-const macrosData = {
-  carbs: 251,
-  protein: 74,
-  fat: 30,
-};
+import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { Appbar, Avatar, Button } from "react-native-paper";
+import { getFoodList } from "../services/api";
 
 export default function Explore() {
-  const totalCalories = mealData.reduce((sum, item) => sum + item.cals, 0); // Сумма калорий
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const refreshData = async () => {
+    try {
+      setLoading(true);
+      // Добавьте здесь ваш код для обновления данных
+      console.log("Данные обновляются...");
+      // Например, обновление состояния или вызов API
+    } catch (err) {
+      console.error("Ошибка при обновлении данных:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getFoodList(); // Fetch data from server
+        setData(response[0]); // Assuming response is an array, use the first item
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#89BD71" />
+        <Text>Loading data...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  const { nutrition, foodConsumed, goal } = data || {};
+  const totalCalories = nutrition?.calories || 0;
+  const macros = nutrition || { fats: 0, carbohydrates: 0, proteins: 0 };
+  const calorieGoal = goal?.nutrition?.calories || 4500;
 
   return (
     <View style={styles.index}>
@@ -33,31 +69,40 @@ export default function Explore() {
       <View style={styles.header}>
         <Text style={styles.title}>Today</Text>
         <Text style={styles.totalCalories}>{totalCalories} cal</Text>
-        <Text style={styles.caloriesGoal}>/ 4500 goal</Text>
+        <Text style={styles.caloriesGoal}>/ {calorieGoal} goal</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-
-        {mealData.map((item, index) => (
+        {foodConsumed.map((item, index) => (
           <View key={index} style={styles.foodItem}>
-            <Text style={styles.foodName}>{item.name}</Text>
-            <Text style={styles.foodCals}>{item.cals} cal</Text>
+            <Text style={styles.foodName}>{item.food.name}</Text>
+            <Text style={styles.foodCals}>{item.nutrition.calories} cal</Text>
           </View>
         ))}
 
         <View style={styles.macrosContainer}>
           <View style={styles.macroItem}>
             <Text style={styles.macroLabel}>Carbs</Text>
-            <Text style={styles.macroValue}>{macrosData.carbs} g</Text>
+            <Text style={styles.macroValue}>{macros.carbohydrates} g</Text>
           </View>
           <View style={styles.macroItem}>
             <Text style={styles.macroLabel}>Protein</Text>
-            <Text style={styles.macroValue}>{macrosData.protein} g</Text>
+            <Text style={styles.macroValue}>{macros.proteins} g</Text>
           </View>
           <View style={styles.macroItem}>
             <Text style={styles.macroLabel}>Fat</Text>
-            <Text style={styles.macroValue}>{macrosData.fat} g</Text>
+            <Text style={styles.macroValue}>{macros.fats} g</Text>
           </View>
+        </View>
+        <View style={styles.refreshContainer}>
+          <Button
+            icon="refresh"
+            mode="contained"
+            buttonColor="#89BD71"
+            onPress={refreshData}
+          >
+            Обновить
+          </Button>
         </View>
       </ScrollView>
     </View>
@@ -100,13 +145,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  sectionTitle: {
-    marginTop: 20,
-    fontSize: 22,
-    fontWeight: "600",
-    marginBottom: 16,
-    textAlign: "center",
-  },
   foodItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -141,5 +179,21 @@ const styles = StyleSheet.create({
   macroValue: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: "red",
+    textAlign: "center",
   },
 });

@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
-import ImagePicker from 'react-native-image-crop-picker';
+import { Href, Link, router } from "expo-router";
+import ImagePicker from "react-native-image-crop-picker";
 import {
   StyleSheet,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -10,8 +12,8 @@ import {
 } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
-import { Button } from "react-native-paper";
-import { getFoodByPhoto } from "@/app/services/api";
+import { Searchbar, Button, TextInput } from "react-native-paper";
+import { addFoodConsumedLight, getFoodByPhoto } from "@/app/services/api";
 
 const UploadPhoto = () => {
   const [cameraType, setCameraType] = useState<CameraType>("back");
@@ -21,13 +23,32 @@ const UploadPhoto = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
   const cameraRef = useRef<CameraView>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [food, setFood] = useState("");
+  const [grams, setGrams] = useState();
 
   const [file, setFile] = useState<File | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
 
   const toggleCameraType = () => {
     setCameraType((current) => (current === "back" ? "front" : "back"));
   };
-
+  const handlePress = (value: string) => {
+    router.push(`./(unit)/${value}`);
+  };
+  const handleAcceptFood = async () => {
+    try {
+      const gramsValue = parseFloat(grams);
+      if (isNaN(gramsValue)) {
+        setError("Invalid number of grams");
+        return;
+      }
+      await addFoodConsumedLight({ mass: gramsValue, foodCanName: food.canName });
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Error submitting food");
+    }
+  };
 
   const takePhoto = async () => {
     if (cameraRef.current) {
@@ -36,20 +57,21 @@ const UploadPhoto = () => {
         const photo = await cameraRef.current.takePictureAsync({
           quality: 1,
           base64: true,
-          imageType:"jpg",
+          imageType: "jpg",
         });
 
         if (photo?.uri) {
-    
-          console.log(photo.uri)
-          const imageResponse = await fetch(photo.uri)
-          const blob= await imageResponse.blob()  
-
-
-          console.log(blob)
+          console.log(photo.uri);
+          const imageResponse = await fetch(photo.uri);
+          const blob = await imageResponse.blob();
 
           // Передача файла в функцию
-          await getFoodByPhoto(blob); // Assuming `getFoodByPhoto` expects FormData
+          const response = await getFoodByPhoto(blob);
+
+          // Assuming `getFoodByPhoto` expects FormData
+          setFood(response.data);
+          console.log(response.data);
+
           setPhotoTaken(true);
         }
       } catch (err) {
@@ -75,32 +97,159 @@ const UploadPhoto = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {!photoTaken ? (
-        <CameraView ref={cameraRef} style={styles.camera} facing={cameraType}>
-          <View style={styles.controls}>
-            <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
-              <Text style={styles.text}>Flip Camera</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={takePhoto}>
-              <Text style={styles.text}>Take Photo</Text>
-            </TouchableOpacity>
-          </View>
-        </CameraView>
-      ) : (
-        <View style={styles.result}>
-          <Text>Photo successfully sent!</Text>
-          <Button onPress={() => setPhotoTaken(false)}>
-            Take Another Photo
-          </Button>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.index}>
+        {/* <View style={styles.input}>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+          />
+        </View> */}
+        <Button
+          icon="camera"
+          buttonColor="#89BD71"
+          mode="contained"
+          onPress={() => setShowCamera((prev) => !prev)}
+        >
+          Photo
+        </Button>
 
+        {showCamera && (
+          <View style={styles.openCamera}>
+            <View style={styles.container}>
+              {!photoTaken ? (
+                <CameraView
+                  ref={cameraRef}
+                  style={styles.camera}
+                  facing={cameraType}
+                >
+                  <View style={styles.controls}>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={toggleCameraType}
+                    >
+                      <Text style={styles.text}>Flip Camera</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={takePhoto}>
+                      <Text style={styles.text}>Take Photo</Text>
+                    </TouchableOpacity>
+                  </View>
+                </CameraView>
+              ) : (
+                <View style={styles.result}>
+                  <Text>Is that {food?.name}?</Text>
+                  <TextInput
+                    label="Enter the number of grams"
+                    onChangeText={(text) => setGrams(text)}
+                  />
+                  <Button
+                    icon="camera"
+                    mode="contained"
+                    onPress={handleAcceptFood}
+                  >
+                    Press me
+                  </Button>
+                  <Button onPress={() => setPhotoTaken(false)}>
+                    Take Another Photo
+                  </Button>
+                </View>
+              )}
+              {loading && (
+                <ActivityIndicator
+                  size="large"
+                  color="#0000ff"
+                  style={styles.loader}
+                />
+              )}
+              {error && <Text style={styles.error}>{error}</Text>}
+            </View>
+          </View>
+        )}
+        <View style={styles.toplevelUnits}>
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("meat");
+            }}
+          >
+            <Text>Meat</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("fish");
+            }}
+          >
+            <Text>Seafood</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("vegetables");
+            }}
+          >
+            <Text>Vegetables</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("fruits");
+            }}
+          >
+            <Text>Fruits</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("grains");
+            }}
+          >
+            <Text>Grains</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("dairy");
+            }}
+          >
+            <Text>Dairy</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("bakery");
+            }}
+          >
+            <Text>Bakery</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("snacks");
+            }}
+          >
+            <Text>Snacks</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.unit}
+            onPress={() => {
+              handlePress("beverages");
+            }}
+          >
+            <Text>Beverages</Text>
+          </TouchableOpacity>
         </View>
-      )}
-      {loading && (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
-      )}
-      {error && <Text style={styles.error}>{error}</Text>}
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -109,6 +258,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     backgroundColor: "white",
+    paddingTop: 30,
+    paddingBottom: 30,
   },
   camera: {
     flex: 1,
@@ -142,6 +293,50 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginTop: 10,
+  },
+  index: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  openCamera: {
+    flex: 2,
+    display: "flex",
+    justifyContent: "center",
+    // backgroundColor: "red",
+    marginBottom: 40,
+  },
+  input: {
+    flex: 0.2,
+    display: "flex",
+    justifyContent: "center",
+    // backgroundColor: "green",
+    marginTop: 40,
+  },
+  toplevelUnits: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+    width: "100%",
+    // backgroundColor: "yellow",
+  },
+  unit: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "30%",
+    height: "30%",
+    backgroundColor: "#e8e8e8",
+    borderRadius: 10,
+    minWidth: 0,
+  },
+  unitLink: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "red",
   },
 });
 

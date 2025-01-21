@@ -20,6 +20,10 @@ interface RegisterData {
   name: string;
   email: string;
 }
+interface FoodData {
+  mass: number;
+  foodCanName: string;
+}
 
 const getHeaders = (): AxiosRequestConfig["headers"] => {
   const token = localStorage.getItem("authToken"); //такого НЕТУ
@@ -30,32 +34,55 @@ const getHeaders = (): AxiosRequestConfig["headers"] => {
 };
 
 export const getFoodByPhoto = async (file1: Blob) => {
-  
-  const file = new File([file1], 'image.jpg', { type: "image/jpeg" })
+  const file = new File([file1], "image.jpg", { type: "image/jpeg" });
   const formData = new FormData();
-  formData.append('photo', file);
+  formData.append("photo", file);
   // const formData = new FormData();
 
   // // Убедись, что ты передаешь правильный формат
   // formData.append("photo", file);
-  console.log(file)
+  console.log(file);
   try {
-    const response = await axios.post('http://localhost:3000/food/getFoodByPhoto', formData, {
+    const response = await axios.post(
+      "http://localhost:3000/food/getFoodByPhoto",
+      formData,
+      {
         headers: {
-          'Content-Type': 'multipart/form-data;',
+          "Content-Type": "multipart/form-data;",
         },
-      });
-    console.log(response);
+      }
+    );
+
     return response; // Вернуть данные с сервера
   } catch (error) {
     console.error("Error uploading photo:", error);
     throw error; // Пробросить ошибку дальше
   }
 };
+
+// GET [2]
 export const getFoodList = async (): Promise<FoodList[]> => {
-  const response = await api.get("/food/getFoodList");
+  const token = localStorage.getItem("authToken"); // Or another method to get the token
+  const response = await api.get("/day/getUserDayInfoListLight", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
+
+export const addFoodConsumedLight = async (
+  foodData: FoodData
+): Promise<User[]> => {
+  const token = localStorage.getItem("authToken"); // Or another method to get the token
+  const response = await api.post("/user/addFoodConsumedLight", foodData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export const register = async (userData: RegisterData): Promise<User[]> => {
   const response = await api.post("/users", userData);
   return response.data;

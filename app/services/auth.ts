@@ -37,6 +37,7 @@ export const loginRequest = async (
       password,
     });
     console.log("Login successful:", response.data);
+    localStorage.setItem('authToken', response.data.token);
     return response.data; // Assuming response.data is of type User
   } catch (error: any) {
     console.error(
