@@ -10,10 +10,11 @@ export default function Explore() {
   const refreshData = async () => {
     try {
       setLoading(true);
-      // Добавьте здесь ваш код для обновления данных
       console.log("Данные обновляются...");
-      // Например, обновление состояния или вызов API
+      const response = await getFoodList(); // Вызов API для получения новых данных
+      setData(response[0]); // Обновление состояния с новыми данными
     } catch (err) {
+      setError(err.message);
       console.error("Ошибка при обновлении данных:", err);
     } finally {
       setLoading(false);
