@@ -2,6 +2,7 @@ import * as React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Appbar, Avatar } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
+import UploadPhoto from "@/components/UploadPhoto";
 
 export default function HomeScreen() {
   const [calories, setCalories] = React.useState(2700);
@@ -13,28 +14,31 @@ export default function HomeScreen() {
   return (
     <View style={styles.index}>
       <Appbar.Header style={styles.appbarHeader}>
-        <Appbar.Content title="Hello Lila" titleStyle={{ color: "white" }} />
+        <Appbar.Content title="Hello dUC" titleStyle={{ color: "white" }} />
         <Avatar.Image
           size={40}
           source={require("../../assets/images/woman.jpg")}
         />
+                <UploadPhoto />
       </Appbar.Header>
       <View style={styles.header}>
         <Text style={styles.title}>Today</Text>
         <Text style={styles.calories}>{calories} cal</Text>
         <Text style={styles.caloriesGoal}>/ {caloriesGoal} goal</Text>
       </View>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text style={styles.textOfSection}>Stats</Text>
         <DailyMacrosStats proteins={60} carbs={75} fat={40} />
         <Text style={styles.textOfSection}>AI advice</Text>
+        
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           style={styles.infoBox}
         >
           <Text style={styles.textAdvice}>{adviceAI}</Text>
         </ScrollView>
-      </View>
+
+      </ScrollView>
     </View>
   );
 }
