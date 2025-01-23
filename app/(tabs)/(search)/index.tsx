@@ -9,11 +9,13 @@ import {
   View,
   ActivityIndicator,
   Linking,
+  Image,
 } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
 import { Searchbar, Button, TextInput } from "react-native-paper";
 import { addFoodConsumedLight, getFoodByPhoto } from "@/app/services/api";
+import { ReactStorage, ValEnum } from "@/app/services/reactStorage";
 
 const UploadPhoto = () => {
   const [cameraType, setCameraType] = useState<CameraType>("back");
@@ -26,6 +28,7 @@ const UploadPhoto = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [food, setFood] = useState("");
   const [grams, setGrams] = useState();
+  const [photoUri, setPhotoUri] = useState("");
 
   const [file, setFile] = useState<File | null>(null);
   const [showCamera, setShowCamera] = useState(false);
@@ -43,7 +46,11 @@ const UploadPhoto = () => {
         setError("Invalid number of grams");
         return;
       }
-      await addFoodConsumedLight({ mass: gramsValue, foodCanName: food.canName });
+      const dailyInfo = await addFoodConsumedLight({
+        mass: gramsValue,
+        foodCanName: food.canName,
+      });
+      ReactStorage.saveVal(ValEnum.DAILYINFO, dailyInfo);
     } catch (error) {
       console.error("Error:", error);
       setError("Error submitting food");
@@ -61,16 +68,11 @@ const UploadPhoto = () => {
         });
 
         if (photo?.uri) {
-          console.log(photo.uri);
-          const imageResponse = await fetch(photo.uri);
-          const blob = await imageResponse.blob();
-
-          // Передача файла в функцию
-          const response = await getFoodByPhoto(blob);
+          const response = await getFoodByPhoto(photo);
 
           // Assuming `getFoodByPhoto` expects FormData
-          setFood(response.data);
-          console.log(response.data);
+          setFood(response.response.data);
+          setPhotoUri(response.uri);
 
           setPhotoTaken(true);
         }
@@ -138,17 +140,18 @@ const UploadPhoto = () => {
                 </CameraView>
               ) : (
                 <View style={styles.result}>
-                  <Text style={{fontSize: 30}}>Is that {food?.name}?</Text>
+                  <Text style={{ fontSize: 30 }}>Is that {food?.name}?</Text>
+                  <Image source={{ uri: photoUri }} style={styles.image} />
                   <TextInput
                     label="Enter the number of grams"
-                    style={{marginTop: 20, width: "80%"}}
+                    style={{ marginTop: 20, width: "80%" }}
                     onChangeText={(text) => setGrams(text)}
                   />
                   <Button
                     mode="contained"
                     buttonColor="#89BD71"
                     onPress={handleAcceptFood}
-                    style={{marginTop: 20, marginBottom: 30, width: "80%"}}
+                    style={{ marginTop: 20, marginBottom: 30, width: "80%" }}
                   >
                     Confirm
                   </Button>
@@ -265,6 +268,10 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+  },
+  image: {
+    width: 100, // Set your desired width
+    height: 100, // Set your desired height
   },
   controls: {
     flexDirection: "row",

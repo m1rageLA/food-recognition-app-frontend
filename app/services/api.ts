@@ -1,7 +1,16 @@
 import axios, { AxiosRequestConfig } from "axios";
+import FormData from "form-data";
+// import * as fs from "fs";
+import * as fs from "react-native-fs";
+// const RNFS = require("react-native-fs");
+import { CameraCapturedPicture } from "expo-camera";
+import { Platform } from "react-native";
+import TokenStorage from "../services/tokenStorage";
+
+export const localhost = "http://34.66.153.5:3000";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: localhost,
 });
 
 interface User {
@@ -25,35 +34,36 @@ interface FoodData {
   foodCanName: string;
 }
 
-const getHeaders = (): AxiosRequestConfig["headers"] => {
-  const token = localStorage.getItem("authToken"); //такого НЕТУ
+const getHeaders = async (): Promise<AxiosRequestConfig["headers"]> => {
+  const token = await TokenStorage.loadToken();
   return {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
 };
 
-export const getFoodByPhoto = async (file1: Blob) => {
-  const file = new File([file1], "image.jpg", { type: "image/jpeg" });
+export const getFoodByPhoto = async (photo: CameraCapturedPicture) => {
   const formData = new FormData();
-  formData.append("photo", file);
-  // const formData = new FormData();
 
-  // // Убедись, что ты передаешь правильный формат
-  // formData.append("photo", file);
-  console.log(file);
+  const uri =
+    Platform.OS === "android" ? photo.uri : photo.uri.replace("file://", "");
+  formData.append("photo", {
+    uri: uri,
+    name: `photo_${Date.now()}.jpg`,
+    type: "image/jpeg",
+  });
+
   try {
-    const response = await axios.post(
-      "http://localhost:3000/food/getFoodByPhoto",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data;",
-        },
-      }
-    );
+    const response = await axios({
+      method: "post",
+      url: localhost + "/food/getFoodByPhoto",
+      data: formData,
+      headers: {
+        "Content-Type": `multipart/form-data`,
+      },
+    });
 
-    return response; // Вернуть данные с сервера
+    return { response: response, uri: uri }; // Вернуть данные с сервера
   } catch (error) {
     console.error("Error uploading photo:", error);
     throw error; // Пробросить ошибку дальше
@@ -62,7 +72,7 @@ export const getFoodByPhoto = async (file1: Blob) => {
 
 // GET [2]
 export const getFoodList = async (): Promise<FoodList[]> => {
-  const token = localStorage.getItem("authToken"); // Or another method to get the token
+  const token = await TokenStorage.loadToken();
   const response = await api.get("/day/getUserDayInfoListLight", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -74,7 +84,7 @@ export const getFoodList = async (): Promise<FoodList[]> => {
 export const addFoodConsumedLight = async (
   foodData: FoodData
 ): Promise<User[]> => {
-  const token = localStorage.getItem("authToken"); // Or another method to get the token
+  const token = await TokenStorage.loadToken();
   const response = await api.post("/user/addFoodConsumedLight", foodData, {
     headers: {
       Authorization: `Bearer ${token}`,

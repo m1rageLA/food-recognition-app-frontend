@@ -25,9 +25,14 @@ export default function LoginPage() {
   const handleSignIn = async () => {
     try {
       await loginRequest(email.value, password.value);
+      router.replace("./(tabs)");
     } catch (error) {
       console.error("Login failed:", error);
     }
+  };
+
+  const handleRegister = () => {
+    router.push("./RegisterPage");
   };
 
   return (
@@ -68,6 +73,15 @@ export default function LoginPage() {
             onPress={handleSignIn}
           >
             Sign in
+          </Button>
+          <Button
+            buttonColor="#89BD71"
+            style={styles.button}
+            icon=""
+            mode="contained"
+            onPress={handleRegister}
+          >
+            Register
           </Button>
         </View>
       </View>

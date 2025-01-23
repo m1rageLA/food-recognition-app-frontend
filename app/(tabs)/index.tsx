@@ -14,6 +14,9 @@ import {
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
 import { getFoodList } from "../services/api";
+import { router, useNavigation } from "expo-router";
+import TokenStorage from "../services/tokenStorage";
+import { ReactStorage, ValEnum } from "../services/reactStorage";
 
 export default function HomeScreen() {
   const [data, setData] = React.useState(null);
@@ -26,12 +29,39 @@ export default function HomeScreen() {
   );
   const [visibleMenu, setVisibleMenu] = React.useState(false);
   const [visibleModal, setVisibleModal] = React.useState(false); // Состояние для управления модальным окном
-  const [goal, setGoal] = React.useState('');
+  const [goal, setGoal] = React.useState("");
+
+  const navigation = useNavigation();
+  React.useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", async () => {
+      console.log("Screen is focused");
+      const dataString = await ReactStorage.loadVal(ValEnum.DAILYINFO);
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setData(data);
+      }
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      console.log("Screen is unfocused");
+    });
+
+    return () => {
+      // Cleanup event listeners
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [navigation]);
+
+  const checkJwtTocken = async (): Promise<boolean> => {
+    return !!(await TokenStorage.loadToken());
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getFoodList();
+        ReactStorage.saveVal(ValEnum.DAILYINFO, response[0]);
         setData(response[0]);
       } catch (err) {
         setError(err.message);
@@ -39,8 +69,16 @@ export default function HomeScreen() {
         setLoading(false);
       }
     };
+    checkJwtTocken().then((val) => {
+      console.log(val);
+      if (val) {
+        fetchData();
+      } else {
+        router.replace("./LoginPage");
+      }
+    });
 
-    fetchData();
+    // fetchData();
   }, []);
 
   const refreshData = async () => {
@@ -73,9 +111,15 @@ export default function HomeScreen() {
 
   const handleGoalSubmit = () => {
     setCaloriesGoal(goal); // Обновляем цель калорий
-    
-    setGoal(''); // Очистка поля ввода после отправки
+
+    setGoal(""); // Очистка поля ввода после отправки
     closeModal(); // Закрытие модального окна
+  };
+
+  const handleLogOut = () => {
+    TokenStorage.deleteToken().then(() => {
+      router.replace("./LoginPage");
+    });
   };
 
   return (
@@ -102,7 +146,7 @@ export default function HomeScreen() {
               onDismiss={closeMenu}
               anchor={
                 <IconButton
-                  icon="dots-vertical"  // Иконка для кнопки меню
+                  icon="dots-vertical" // Иконка для кнопки меню
                   iconColor="white"
                   size={30}
                   style={{ marginTop: "-35px" }}
@@ -112,7 +156,7 @@ export default function HomeScreen() {
             >
               <Menu.Item onPress={openModal} title="Set goal" />
               <Divider />
-              <Menu.Item onPress={() => {}} title="Log out" />
+              <Menu.Item onPress={handleLogOut} title="Log out" />
             </Menu>
           </View>
           <UploadPhoto />
@@ -130,7 +174,10 @@ export default function HomeScreen() {
             fat={nutrition?.fats || 0}
           />
           <Text style={styles.textOfSection}>AI advice</Text>
-          <ScrollView contentContainerStyle={styles.scrollContent} style={styles.infoBox}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            style={styles.infoBox}
+          >
             <Text style={styles.textAdvice}>{adviceAI}</Text>
           </ScrollView>
           <Button
@@ -145,7 +192,11 @@ export default function HomeScreen() {
         </ScrollView>
 
         {/* Модальное окно для установки цели */}
-        <Modal visible={visibleModal} onDismiss={closeModal} contentContainerStyle={styles.modalContainer}>
+        <Modal
+          visible={visibleModal}
+          onDismiss={closeModal}
+          contentContainerStyle={styles.modalContainer}
+        >
           <TextInput
             label="Set your calorie goal"
             value={goal}
@@ -153,7 +204,13 @@ export default function HomeScreen() {
             style={styles.input}
             keyboardType="numeric"
           />
-          <Button textColor="white" buttonColor="#89BD71" mode="contained" onPress={handleGoalSubmit} style={styles.button}>
+          <Button
+            textColor="white"
+            buttonColor="#89BD71"
+            mode="contained"
+            onPress={handleGoalSubmit}
+            style={styles.button}
+          >
             Set Goal
           </Button>
         </Modal>

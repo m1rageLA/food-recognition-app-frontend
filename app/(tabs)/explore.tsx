@@ -1,12 +1,50 @@
 import * as React from "react";
-import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { Appbar, Avatar, Button } from "react-native-paper";
 import { getFoodList } from "../services/api";
+import { useFocusEffect } from "@react-navigation/native";
+import { ReactStorage, ValEnum } from "../services/reactStorage";
+import { useNavigation } from "expo-router";
 
 export default function Explore() {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+  const navigation = useNavigation();
+  React.useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", async () => {
+      console.log("Screen is focused");
+      ReactStorage.loadVal(ValEnum.DAILYINFO)
+        .then((dataString) => {
+          if (dataString) {
+            const data = JSON.parse(dataString);
+            setData(data);
+          }
+        })
+        .catch((error) => {
+          setError(error);
+        })
+        .finally(() => setLoading(false));
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      console.log("Screen is unfocused");
+    });
+
+    return () => {
+      // Cleanup event listeners
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [navigation]);
+
   const refreshData = async () => {
     try {
       setLoading(true);
@@ -20,20 +58,21 @@ export default function Explore() {
       setLoading(false);
     }
   };
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getFoodList(); // Fetch data from server
-        setData(response[0]); // Assuming response is an array, use the first item
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchData();
-  }, []);
+  // React.useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await getFoodList(); // Fetch data from server
+  //       setData(response[0]); // Assuming response is an array, use the first item
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   if (loading) {
     return (

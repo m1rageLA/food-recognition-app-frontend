@@ -1,5 +1,7 @@
 import axios from "axios";
 import { router } from "expo-router";
+import TokenStorage from "../services/tokenStorage";
+import { localhost } from "./api";
 
 interface User {
   username: string;
@@ -13,7 +15,7 @@ export const registerRequest = async (
   password: string
 ): Promise<User | void> => {
   try {
-    const response = await axios.post("http://localhost:3000/user", {
+    const response = await axios.post(localhost + "/user", {
       username,
       email,
       password,
@@ -36,7 +38,7 @@ export const loginRequest = async (
   password: string
 ): Promise<User | void> => {
   try {
-    const response = await axios.post("http://localhost:3000/user/login", {
+    const response = await axios.post(localhost + "/user/login", {
       usernameOrEmail,
       password,
     });
@@ -44,7 +46,7 @@ export const loginRequest = async (
       router.replace("../.", { relativeToDirectory: true });
     }
     console.log("Login successful:", response.data);
-    localStorage.setItem('authToken', response.data.token);
+    await TokenStorage.saveToken(response.data.token);
     return response.data; // Assuming response.data is of type User
   } catch (error: any) {
     console.error(
