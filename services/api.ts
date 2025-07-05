@@ -5,7 +5,7 @@ import * as fs from "react-native-fs";
 // const RNFS = require("react-native-fs");
 import { CameraCapturedPicture } from "expo-camera";
 import { Platform } from "react-native";
-import TokenStorage from "../services/tokenStorage";
+import TokenStorage from "./tokenStorage";
 
 export const localhost = "http://34.66.153.5:3000";
 

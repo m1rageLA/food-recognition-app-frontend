@@ -10,7 +10,7 @@ import { Appbar, Avatar, Button } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
 import TextInput from "@/components/Login/TextInput";
-import { registerRequest } from "./services/auth";
+import { registerRequest } from "../services/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState({ value: "" });

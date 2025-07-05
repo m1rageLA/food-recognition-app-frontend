@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Image, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { getFoodByPhoto } from "../app/services/api"; // Импортируем API модуль
+import { getFoodByPhoto } from "../services/api"; // Импортируем API модуль
 
 const UploadPhoto = () => {
   const [file, setFile] = useState<File | null>(null); // Состояние для файла //SHUYALI SKRIZ AANNNYYY

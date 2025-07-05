@@ -1,6 +1,6 @@
 import axios from "axios";
 import { router } from "expo-router";
-import TokenStorage from "../services/tokenStorage";
+import TokenStorage from "./tokenStorage";
 import { localhost } from "./api";
 
 interface User {

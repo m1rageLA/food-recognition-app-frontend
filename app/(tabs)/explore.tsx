@@ -7,15 +7,15 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Appbar, Avatar, Button } from "react-native-paper";
-import { getFoodList } from "../services/api";
+import { getFoodList } from "../../services/api";
 import { useFocusEffect } from "@react-navigation/native";
-import { ReactStorage, ValEnum } from "../services/reactStorage";
+import { ReactStorage, ValEnum } from "../../services/reactStorage";
 import { useNavigation } from "expo-router";
 
 export default function Explore() {
-  const [data, setData] = React.useState(null);
+  const [data, setData] = React.useState<any>(null); // Replace 'any' with the actual type, e.g. FoodList | null, if you have it
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const navigation = useNavigation();
   React.useEffect(() => {
@@ -52,7 +52,11 @@ export default function Explore() {
       const response = await getFoodList(); // Вызов API для получения новых данных
       setData(response[0]); // Обновление состояния с новыми данными
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
       console.error("Ошибка при обновлении данных:", err);
     } finally {
       setLoading(false);
@@ -109,12 +113,14 @@ export default function Explore() {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-        {foodConsumed.map((item, index) => (
-          <View key={index} style={styles.foodItem}>
-            <Text style={styles.foodName}>{item.food.name}</Text>
-            <Text style={styles.foodCals}>{item.nutrition.calories} cal</Text>
-          </View>
-        ))}
+        {Array.isArray(foodConsumed) &&
+          foodConsumed.map((item, index) => (
+            <View key={index} style={styles.foodItem}>
+              <Text style={styles.foodName}>{item.food.name}</Text>
+              <Text style={styles.foodCals}>{item.nutrition.calories} cal</Text>
+            </View>
+          ))}
+
 
         <View style={styles.macrosContainer}>
           <View style={styles.macroItem}>
@@ -231,5 +237,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "red",
     textAlign: "center",
+  },
+  refreshContainer: {
+    marginTop: 24,
+    alignItems: "center",
   },
 });

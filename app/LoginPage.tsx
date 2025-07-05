@@ -10,7 +10,7 @@ import { Appbar, Avatar, Button } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
 import TextInput from "@/components/Login/TextInput";
-import { loginRequest } from "./services/auth";
+import { loginRequest } from "../services/auth";
 import { router } from "expo-router";
 
 export default function LoginPage() {

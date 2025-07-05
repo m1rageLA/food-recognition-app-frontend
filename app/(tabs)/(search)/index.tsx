@@ -14,8 +14,8 @@ import {
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
 import { Searchbar, Button, TextInput } from "react-native-paper";
-import { addFoodConsumedLight, getFoodByPhoto } from "@/app/services/api";
-import { ReactStorage, ValEnum } from "@/app/services/reactStorage";
+import { addFoodConsumedLight, getFoodByPhoto } from "@/services/api";
+import { ReactStorage, ValEnum } from "@/services/reactStorage";
 
 const UploadPhoto = () => {
   const [cameraType, setCameraType] = useState<CameraType>("back");

@@ -13,10 +13,10 @@ import {
 } from "react-native-paper";
 import DailyMacrosStats from "@/components/DailyMacrosStats";
 import UploadPhoto from "@/components/UploadPhoto";
-import { getFoodList } from "../services/api";
+import { getFoodList } from "../../services/api";
 import { router, useNavigation } from "expo-router";
-import TokenStorage from "../services/tokenStorage";
-import { ReactStorage, ValEnum } from "../services/reactStorage";
+import TokenStorage from "../../services/tokenStorage";
+import { ReactStorage, ValEnum } from "../../services/reactStorage";
 
 export default function HomeScreen() {
   const [data, setData] = React.useState(null);
@@ -71,11 +71,11 @@ export default function HomeScreen() {
     };
     checkJwtTocken().then((val) => {
       console.log(val);
-      if (val) {
-        fetchData();
-      } else {
-        router.replace("./LoginPage");
-      }
+      // if (val) {
+      //   fetchData();
+      // } else {
+      //   router.replace("./LoginPage");
+      // }
     });
 
     // fetchData();
